@@ -2,7 +2,7 @@ import express from 'express'
 import dotenv from 'dotenv'
 import connectDB from './configs/Db.js'
 import authRoute from './routes/authRoutes.js'
-import { notFound } from './middlewares/errorMiddlewares.js'
+import { errorHandler, notFound } from './middlewares/errorMiddlewares.js'
 dotenv.config()
 
 
@@ -24,6 +24,7 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRoute)
 
 app.use(notFound)
+app.use(errorHandler)
 app.listen(port, () => {
     console.log(`Server running in ${port}`)
 })
