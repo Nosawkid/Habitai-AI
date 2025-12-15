@@ -1,9 +1,9 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import Home from "./pages/Home";
 import VenueDetails from "./pages/VenueDetails";
+import Login from "./pages/Login";
 
-// Keep your mockData here for now so it's accessible everywhere
 const mockData = [
   {
     id: 1,
@@ -13,7 +13,7 @@ const mockData = [
     safetyScore: 4.8,
     distance: "0.5 km",
     image:
-      "https://lh3.googleusercontent.com/gps-cs-s/AG0ilSwOnnIdc3KCunwdnbYTmMxvIIHX3upy_RpakBQKZ-Fn_5HzyYwmlZ-ow8OU1uAcuyh99-onF3VrLS5R6RqDtkyC3vdwes5R-hUPnzT0SGvya1cgDWMLJVihjRakJ4KCjsJAPFYk=s1360-w1360-h1020-rw",
+      "https://images.unsplash.com/photo-1522771753035-1a5b6562f3ba?auto=format&fit=crop&w=800",
     aiSummary: "Pros: Close to college. Cons: Spicy food.",
   },
   {
@@ -30,23 +30,78 @@ const mockData = [
 ];
 
 function App() {
+  // Check login state immediately
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    window.location.href = "/"; // Force reload to clear state
+  };
+
   return (
     <Router>
-      <div className="min-h-screen bg-gray-50 font-sans">
-        <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10 px-6 py-4">
-          <span className="text-2xl font-extrabold text-blue-600">
-            Habitat-AI
-          </span>
+      <div className="font-sans text-gray-900 bg-gray-50 min-h-screen flex flex-col">
+        {/* --- GLOBAL NAVBAR --- */}
+        <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between h-16 items-center">
+              {/* Logo */}
+              <Link to="/" className="flex items-center">
+                <span className="text-2xl font-extrabold text-blue-600 tracking-tight">
+                  Habitat-AI
+                </span>
+                <span className="ml-3 px-2 py-0.5 rounded text-xs font-semibold bg-blue-100 text-blue-800 hidden sm:block">
+                  MSRIT Edition
+                </span>
+              </Link>
+
+              {/* Right Side Buttons */}
+              <div className="flex items-center space-x-4">
+                <Link
+                  to="/"
+                  className="text-gray-500 hover:text-blue-600 font-medium text-sm"
+                >
+                  Dashboard
+                </Link>
+
+                {/* DYNAMIC AUTH BUTTON */}
+                {user ? (
+                  <div className="flex items-center space-x-3">
+                    <span className="text-xs text-gray-500 hidden md:block">
+                      Welcome, {user.email.split("@")[0]}
+                    </span>
+                    <button
+                      onClick={handleLogout}
+                      className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-200 transition border border-gray-200"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                ) : (
+                  <Link to="/login">
+                    <button className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition shadow-sm">
+                      Login (Student)
+                    </button>
+                  </Link>
+                  
+                )}
+              </div>
+            </div>
+          </div>
         </nav>
 
-        <Routes>
-          <Route path="/" element={<Home venues={mockData} />} />
-          {/* This logic passes the specific venue data to the details page */}
-          <Route
-            path="/venue/:id"
-            element={<VenueDetails venues={mockData} />}
-          />
-        </Routes>
+        {/* --- MAIN CONTENT --- */}
+        <div className="flex-1">
+          <Routes>
+            <Route path="/" element={<Home venues={mockData} />} />
+            <Route
+              path="/venue/:id"
+              element={<VenueDetails venues={mockData} />}
+            />
+            <Route path="/login" element={<Login />} />
+            
+          </Routes>
+        </div>
       </div>
     </Router>
   );
